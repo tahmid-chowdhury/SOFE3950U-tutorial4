@@ -28,6 +28,9 @@ void show_results(player *players, int num_players);
 
 int main(int argc, char *argv[])
 {
+    (void)argc; // Suppress unused parameter warning
+    (void)argv; // Suppress unused parameter warning
+
     // An array of 4 players, may need to be a pointer if you want it set dynamically
     player players[NUM_PLAYERS];
     
@@ -52,12 +55,58 @@ int main(int argc, char *argv[])
 
     // Perform an infinite loop getting command input from users until game ends
     while (fgets(buffer, BUFFER_LEN, stdin) != NULL)
-    {
+    {    	
         // Call functions from the questions and players source files
+        // Display available categories and question values
+    	display_categories();
+    	
+    	// Get user input (category and value)
+    	printf("Enter category and value (e.g., 'programming 100'): ");
+    	fgets(buffer, BUFFER_LEN, stdin);
+    	char category[MAX_LEN] = { 0 };
+    	int value = 0;
+    	sscanf(buffer, "%s %d", category, &value);
+    	
+    	// Display the question for the chosen category and value
+    	display_question(category, value);
+    	
+    	// Get user's answer
+    	printf("Your answer: ");
+    	fgets(buffer, BUFFER_LEN, stdin);
+    	char answer[MAX_LEN] = { 0 };
+    	sscanf(buffer, "%s", answer);
+    	
+    	// Validate answer and update player scores
+    	if (valid_answer(category, value, answer)) {
+    	    printf("Correct!\n");
+    	    update_score(players, NUM_PLAYERS, players[0].name, value);
+    	} else {
+    	    printf("Incorrect!\n");
+    	}
+    	
+    	// Mark the question as answered
+    	for (int i = 0; i < NUM_QUESTIONS; ++i) {
+    	    if (strcmp(questions[i].category, category) == 0 && questions[i].value == value) {
+    	    	questions[i].answered = true;
+    	    }
+    	}
 
         // Execute the game until all questions are answered
-
-        // Display the final results and exit
+        // Check if all questions are answered (end game condition)
+        bool all_answered = true;
+        for (int i = 0; i < NUM_QUESTIONS; ++i) {
+            if (!questions[i].answered) {
+            	all_answered = false;
+            	break;
+            }
+        }
+        if (all_answered) {
+            break; // Exit the game loop
+        }
     }
+    
+    // Display the final results and exit
+    show_results(players, NUM_PLAYERS);
+    
     return EXIT_SUCCESS;
 }
