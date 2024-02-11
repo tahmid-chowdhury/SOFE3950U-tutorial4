@@ -23,7 +23,12 @@
 void tokenize(char *input, char **tokens);
 
 // Displays the game results for each player, their name and final score, ranked from first to last place
-void show_results(player *players, int num_players);
+void show_results(player *players, int num_players) {
+    printf("Game Results:\n");
+    for (int i = 0; i < num_players; ++i) {
+    	printf("%s: %d points\n", players[i].name, players[i].score);
+    }
+}
 
 
 int main(int argc, char *argv[])
@@ -52,10 +57,14 @@ int main(int argc, char *argv[])
     	// Initialize score
     	players[i].score = 0;
     }
+    
+    int player_number = 0;
 
     // Perform an infinite loop getting command input from users until game ends
     while (fgets(buffer, BUFFER_LEN, stdin) != NULL)
     {    	
+        printf("Player %d's turn:\n", player_number + 1);
+        
         // Call functions from the questions and players source files
         // Display available categories and question values
     	display_categories();
@@ -79,7 +88,7 @@ int main(int argc, char *argv[])
     	// Validate answer and update player scores
     	if (valid_answer(category, value, answer)) {
     	    printf("Correct!\n");
-    	    update_score(players, NUM_PLAYERS, players[0].name, value);
+    	    update_score(players, NUM_PLAYERS, players[player_number].name, value);
     	} else {
     	    printf("Incorrect!\n");
     	}
@@ -102,6 +111,11 @@ int main(int argc, char *argv[])
         }
         if (all_answered) {
             break; // Exit the game loop
+        }
+        if (player_number == 3) {
+            player_number = 0;
+        } else {
+            player_number++;
         }
     }
     
